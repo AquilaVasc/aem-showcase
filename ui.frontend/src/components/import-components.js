@@ -50,6 +50,8 @@ import {
 //lazyload / code splitting example of an internal component
 const LazyTextComponent = withAsyncImport(() => import(`./Text/Text`));
 
+const CommentComponent = withAsyncImport(() => import("./Comments/Comments"))
+
 //lazyload / code splitting examples of external components
 const TitleV2 = withAsyncImport(() => import(`@adobe/aem-core-components-react-base/dist/authoring/title/v2/TitleV2`));
 const CarouselV1 = withAsyncImport(() => import(`@adobe/aem-core-components-react-spa/dist/container/carousel/v1/CarouselV1`));
@@ -92,3 +94,27 @@ const TextEditConfig = {
 };
 
 MapTo('aem-showcase/components/text')(LazyTextComponent, TextEditConfig);
+
+const CommentsEditConfig = {
+    emptyLabel: 'Comments Component',
+
+    isEmpty: function (props) {
+        return !props || !props.commentTitle || props.commentTitle.trim().length < 1;
+    }
+};
+
+MapTo('aem-showcase/components/comments')(CommentComponent, CommentsEditConfig);
+
+
+
+const HeaderComponent = withAsyncImport(() => import("./Header/Header"))
+
+const HeaderEditConfig = {
+    emptyLabel: 'Header Component',
+
+    isEmpty: function (props) {
+        return !props || !props.commentTitle || props.commentTitle.trim().length < 1;
+    }
+};
+
+MapTo('aem-showcase/components/header')(HeaderComponent, HeaderEditConfig);
