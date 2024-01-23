@@ -83,3 +83,23 @@ h5 {
     font-weight: 400;
   }
 }
+
+.footer-container {
+  background-color: black;
+  color: white;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.footer-container img {
+  width: 130px;
+}
+
+.footer-container .container-content .address > div > p {
+  color: white;
+}
+
+.footer-container .container-content .address {
+  border-left: 1px solid white;
+}

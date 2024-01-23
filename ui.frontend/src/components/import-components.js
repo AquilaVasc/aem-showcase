@@ -113,8 +113,21 @@ const HeaderEditConfig = {
     emptyLabel: 'Header Component',
 
     isEmpty: function (props) {
-        return !props || !props.commentTitle || props.commentTitle.trim().length < 1;
+        return !props || !props.logoUrl || props.logoUrl.trim().length < 1;
     }
 };
 
 MapTo('aem-showcase/components/header')(HeaderComponent, HeaderEditConfig);
+
+
+const FooterComponent = withAsyncImport(() => import("./Footer/Footer"))
+
+const FooterEditConfig = {
+    emptyLabel: 'Footer Component',
+
+    isEmpty: function (props) {
+        return !props || !props.logoUrl || props.logoUrl.trim().length < 1;
+    }
+};
+
+MapTo('aem-showcase/components/footer')(FooterComponent, FooterEditConfig);

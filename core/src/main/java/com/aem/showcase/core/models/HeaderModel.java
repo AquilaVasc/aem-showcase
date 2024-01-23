@@ -33,11 +33,9 @@ public class HeaderModel implements ComponentExporter{
     @ValueMapValue
     String logoUrl;
 
-
     @Inject
     @Via("resource")
     public List<Link> links;
-
 
     @Override
     public String getExportedType() {
