@@ -1,7 +1,5 @@
 package com.aem.showcase.core.pojos;
 
-import java.util.UUID;
-
 public class CommentPojo {
     String id;
     String content;
@@ -9,17 +7,6 @@ public class CommentPojo {
     String fullname;
     long upvote_count;
     boolean user_has_upvoted;
-
-    
-    
-    public CommentPojo(String content, String created, String fullname, long upvote_count, boolean user_has_upvoted) {
-        this.id = UUID.randomUUID().toString();
-        this.content = content;
-        this.created = created;
-        this.fullname = fullname;
-        this.upvote_count = upvote_count;
-        this.user_has_upvoted = user_has_upvoted;
-    }
 
     public String getId() {
         return id;

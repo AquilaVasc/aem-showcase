@@ -1,0 +1,5 @@
+{
+    "user.mapping": [
+        "aem-showcase.core:AEMShowCaseUserJCR=[aem-showcase-jcr-service-user]"
+    ]
+}

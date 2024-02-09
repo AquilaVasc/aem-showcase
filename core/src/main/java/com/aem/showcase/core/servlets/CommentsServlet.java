@@ -16,6 +16,7 @@
 package com.aem.showcase.core.servlets;
 
 import com.aem.showcase.core.pojos.CommentPojo;
+import com.aem.showcase.core.services.CommentsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,12 +25,16 @@ import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Servlet that writes some sample content into the response. It is mounted for
@@ -48,14 +53,14 @@ public class CommentsServlet extends SlingAllMethodsServlet {
 
     private static final long serialVersionUID = 1L;
 
+    @Reference
+    CommentsService commentsService;
+
     @Override
     protected void doGet(final SlingHttpServletRequest req, final SlingHttpServletResponse resp)
         throws ServletException, IOException {
 
         List<CommentPojo> comments = new ArrayList<>();
-        comments.add(new CommentPojo("Primeiro comentario", "2024-10-01", "Aquila Vasconcelos da Silva", 2, false));
-        comments.add(new CommentPojo("Segundo comentario", "2024-10-01", "Aquila Vasconcelos da Silva", 2, false));
-        comments.add(new CommentPojo("Terceiro comentario", "2024-10-01", "Aquila Vasconcelos da Silva", 2, false));
 
         JsonNode node = new ObjectMapper().convertValue(comments, JsonNode.class);
         resp.setContentType("application/json");
@@ -63,8 +68,20 @@ public class CommentsServlet extends SlingAllMethodsServlet {
     }
 
     @Override
-    protected void doPost(final SlingHttpServletRequest req, final SlingHttpServletResponse resp)
-    throws ServletException, IOException {
-    // Handle POST method logic if needed
+    protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response)
+        throws ServletException, IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+        sb.append(line);
+        }
+        
+        String data = sb.toString();
+
+        CommentPojo commentPojo = new ObjectMapper().readValue(data, CommentPojo.class);
+        commentPojo.setId(UUID.randomUUID().toString());
+        commentsService.createComment(commentPojo);
+
     }
 }
