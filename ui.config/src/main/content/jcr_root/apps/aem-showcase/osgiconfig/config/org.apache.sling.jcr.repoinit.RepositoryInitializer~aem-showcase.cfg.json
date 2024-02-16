@@ -1,11 +1,15 @@
 {
     "scripts": [
-        "create path (sling:OrderedFolder) /content/dam/aem-showcase",
-        "create path (nt:unstructured) /content/dam/aem-showcase/jcr:content",
-        "set properties on /content/dam/aem-showcase/jcr:content\n  set cq:conf{String} to /conf/aem-showcase\n  set jcr:title{String} to \"AEM Showcase\"\nend",
-        "create path (sling:OrderedFolder) /content/dam/aem-showcase/comments",
-        "create path (nt:unstructured) /content/dam/aem-showcase/comments/jcr:content",
-        "set properties on /content/dam/aem-showcase/comments/jcr:content\n  set cq:conf{String} to /conf/aem-showcase\n  set jcr:title{String} to \"AEM Showcase Comments\"\nend",
-        "create service user aem-showcase-jcr-service-user with forced path system/cq:services/aem-showcase-jcr-service-user\n set principal ACL for aem-showcase-jcr-service-user\n allow jcr:read,rep:write on /content/dam/aem-showcase\nend"
+        "create path /content/dam/aem-showcase(sling:OrderedFolder)",
+        "create path /content/dam/aem-showcase/jcr:content(nt:unstructured)",
+        "create path /content/dam/aem-showcase/comments(nt:Folder)",
+        "create path /content/dam/aem-showcase/comments/jcr:content(nt:unstructured)",
+        "create service user aem-showcase-jcr-service-user with forced path system/cq:services/aem-showcase-jcr-service-user",
+        "set principal ACL for aem-showcase-jcr-service-user\n",
+        "\tallow jcr:all on /content/aem-showcase\n",
+        "\tallow jcr:all on /content/aem-showcase/comments\n",
+        "\tallow jcr:all on /content/dam/aem-showcase\n",
+        "\tallow jcr:all on /content/dam/aem-showcase/comments\nend",
+        "set properties on /content/dam/aem-showcase/jcr:content\n set cq:conf{String} to /conf/aem-showcase\n  set jcr:title{String} to \"AEM Showcase\"\nend"
     ]
 }
