@@ -1,6 +1,8 @@
 package com.aem.showcase.core.servlets.comments;
 
 import java.util.Date;
+
+import com.aem.showcase.core.pojos.CreateMessage;
 import com.aem.showcase.core.pojos.DeleteMessage;
 import com.aem.showcase.core.pojos.comments.CommentPojo;
 import com.aem.showcase.core.pojos.users.AEMUserPojo;
@@ -61,13 +63,13 @@ public class CommentsServlet extends SlingAllMethodsServlet {
 
         ObjectMapper mapper = new ObjectMapper();
         if(null != id && !id.isEmpty()) {
-            CommentPojo comment = commentsService.findById(id);
+            CommentPojo comment = commentsService.findById(id, request);
             JsonNode result = mapper.convertValue(comment, JsonNode.class);
             response.setContentType("application/json");
             response.getWriter().write(result.toString());
         } else {
             List<CommentPojo> comments;
-            comments = commentsService.findAll();
+            comments = commentsService.findAll(request);
             JsonNode result = mapper.convertValue(comments, JsonNode.class);
             response.setContentType("application/json");
             response.getWriter().write(result.toString());
@@ -81,7 +83,7 @@ public class CommentsServlet extends SlingAllMethodsServlet {
         BufferedReader reader = request.getReader();
         String line;
         while ((line = reader.readLine()) != null) {
-        sb.append(line);
+            sb.append(line);
         }
         
         String data = sb.toString();
@@ -96,20 +98,23 @@ public class CommentsServlet extends SlingAllMethodsServlet {
                 try {
                     aemUser = userService.getUser(request.getResourceResolver());
                     String aemUserName = null == aemUser ? "" : aemUser.getFirstName() + " " + aemUser.getLastName();
+                    String aemUserId = null != aemUser.getUserId() && !aemUser.getUserId().isEmpty() ? aemUser.getUserId() : "";
+                    
+                    commentPojo.setCreatedBy(aemUserId);
                     commentPojo.setFullname(aemUserName);
                 } catch (RepositoryException e) {
-                    // log issue
+                    logger.error("error while trying to retrieve the session", e);
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
             }
+
             commentPojo.setId(UUID.randomUUID().toString());
-            if (commentsService.createComment(commentPojo)){
+            CreateMessage message = commentsService.createComment(commentPojo);
+            if (message.isCreated()){
                 JsonNode result = new ObjectMapper().convertValue(commentPojo, JsonNode.class);
                 response.setContentType("application/json");
                 response.getWriter().write(result.toString());
             } else {
-                DeleteMessage message = new DeleteMessage();
-                message.setMessage("User not created");
-                message.setRemoved(false);
                 JsonNode result = new ObjectMapper().convertValue(message, JsonNode.class);
                 response.setContentType("application/json");
                 response.getWriter().write(result.toString());
@@ -136,9 +141,13 @@ public class CommentsServlet extends SlingAllMethodsServlet {
         throws ServletException, IOException{
         AEMUserPojo aemUser;
 
+        String commentId = request.getParameter("id");
+
         try {
             aemUser = userService.getUser(request.getResourceResolver());
             String userId = aemUser.getUserId();
+
+            commentsService.likeOrUnlinkComment(commentId, userId, request);
         } catch (RepositoryException e) {
             logger.error("error while trying to retrieve the session", e);
             response.sendError(HttpServletResponse.SC_FORBIDDEN);

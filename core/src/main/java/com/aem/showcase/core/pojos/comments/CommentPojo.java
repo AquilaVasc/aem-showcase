@@ -1,13 +1,21 @@
 package com.aem.showcase.core.pojos.comments;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class CommentPojo {
     String id;
     String content;
     String created;
     String createdBy;
     String fullname;
-    long upvote_count;
-    boolean user_has_upvoted;
+    long upvoteCount;
+    boolean userHasUpvoted;
+
+    @JsonIgnore
+    List<String> likes = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -41,20 +49,16 @@ public class CommentPojo {
         this.fullname = fullname;
     }
     
-    public long getUpvote_count() {
-        return upvote_count;
+    public long getUpvoteCount() {
+        return likes.size();
     }
     
-    public void setUpvote_count(long upvote_count) {
-        this.upvote_count = upvote_count;
+    public boolean isUserHasUpvoted() {
+        return userHasUpvoted;
     }
     
-    public boolean isUser_has_upvoted() {
-        return user_has_upvoted;
-    }
-    
-    public void setUser_has_upvoted(boolean user_has_upvoted) {
-        this.user_has_upvoted = user_has_upvoted;
+    public void setUserHasUpvoted(boolean userHasUpvoted) {
+        this.userHasUpvoted = userHasUpvoted;
     }
 
     public String getCreatedBy() {
@@ -63,5 +67,13 @@ public class CommentPojo {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public List<String> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<String> likes) {
+        this.likes = likes;
     }  
 }
