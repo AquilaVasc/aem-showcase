@@ -1,9 +1,10 @@
-package com.aem.showcase.core.pojos;
+package com.aem.showcase.core.pojos.comments;
 
 public class CommentPojo {
     String id;
     String content;
     String created;
+    String createdBy;
     String fullname;
     long upvote_count;
     boolean user_has_upvoted;
@@ -56,5 +57,11 @@ public class CommentPojo {
         this.user_has_upvoted = user_has_upvoted;
     }
 
-    
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }  
 }
