@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.aem.showcase.core.pojos.CreateMessage;
 import com.aem.showcase.core.pojos.DeleteMessage;
+import com.aem.showcase.core.pojos.ErrorMessage;
 import com.aem.showcase.core.pojos.comments.CommentPojo;
 import com.aem.showcase.core.pojos.users.AEMUserPojo;
 import com.aem.showcase.core.services.comments.CommentsService;
@@ -139,18 +140,29 @@ public class CommentsServlet extends SlingAllMethodsServlet {
     @Override
     protected void doPut(final SlingHttpServletRequest request, final SlingHttpServletResponse response) 
         throws ServletException, IOException{
-        AEMUserPojo aemUser;
 
         String commentId = request.getParameter("id");
+        if(null != commentId && !commentId.isEmpty()) {
+            AEMUserPojo aemUser;
 
-        try {
-            aemUser = userService.getUser(request.getResourceResolver());
-            String userId = aemUser.getUserId();
+            try {
+                aemUser = userService.getUser(request.getResourceResolver());
+                String userId = aemUser.getUserId();
 
-            commentsService.likeOrUnlinkComment(commentId, userId, request);
-        } catch (RepositoryException e) {
-            logger.error("error while trying to retrieve the session", e);
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                CommentPojo comment = commentsService.likeOrUnlinkComment(commentId, userId, request);
+                JsonNode result = new ObjectMapper().convertValue(comment, JsonNode.class);
+                response.setContentType("application/json");
+                response.getWriter().write(result.toString());
+            } catch (RepositoryException e) {
+                logger.error("error while trying to retrieve the session", e);
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
+        } else {
+            ErrorMessage message = new ErrorMessage(HttpServletResponse.SC_BAD_REQUEST, "you must provide an comment id");
+            JsonNode result = new ObjectMapper().convertValue(message, JsonNode.class);
+            response.setContentType("application/json");
+            response.getWriter().write(result.toString());
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 }

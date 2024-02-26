@@ -256,41 +256,44 @@ public class CommentServiceImpl implements CommentsService {
 
     @Override
     public CommentPojo likeOrUnlinkComment(String commentId, String userId, SlingHttpServletRequest request) {
-        CommentPojo comment = this.findById(commentId, request);
+        CommentPojo comment = null;
 
-        if(comment == null) {
-            return null;
+        if(userId == null || (userId != null && userId.isEmpty())) {
+            return comment;
         }
 
-        List<String> likes = comment.getLikes();
+        try (ResourceResolver resolver = getUserResourceResolver("admin", "admin")){
+    
+            Session session = resolver.adaptTo(Session.class);     
 
-        String commentOwnerId = comment.getCreatedBy();
-        if(likes != null && likes.size() > 0) {
-            if(likes.contains(commentOwnerId)) {
-                likes.remove(commentOwnerId);
-                if(commentOwnerId.equals(commentOwnerId)) {
-                    // once update the logic to return comment pojo with setUserHasUpvoted replace 
-                    // logic to simply invert value  
+            try {
+                Node commentNode = session.getNode("/content/aem-showcase/comments/" + commentId);
+                comment = getCommentByNode(commentNode, request);
+
+                List<String> likes = comment.getLikes();
+
+                if(likes.contains(userId)) {
+                    likes.remove(userId);
                     comment.setUserHasUpvoted(false);
-                }
-            } else {
-                likes.add(commentOwnerId);
-                if(commentOwnerId.equals(commentOwnerId)) {
-                    // once update the logic to return comment pojo with setUserHasUpvoted replace 
-                    // logic to simply invert value  
+                } else {
+                    likes.add(userId);
                     comment.setUserHasUpvoted(true);
                 }
-            }
-        } else {
-            likes = new ArrayList<>();
-            likes.add(commentOwnerId);
 
-            if(commentOwnerId.equals(comment.getCreatedBy())) {
-                comment.setUserHasUpvoted(true);
+                String[] likesArray =  likes.stream().toArray(String[]::new);;
+                commentNode.setProperty(UPVOTE_LIST_PROP, likesArray);
+                session.save();
+            } catch (PathNotFoundException e) {
+                logger.info("there was something wrong during get comments, the error is: {}", e);
             }
+
+            session.logout();
+            resolver.close();
+        } catch (Exception e) {
+            logger.error("there was something wrong during get comment, the error is: {}", e);
         }
-        
-        return null;
+
+        return comment;
     }
 
     Map<String, Object> getAdminResourceResolverMap() {
